@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>黑客帝国</title>
+    <style>
+        body{
+            padding:0;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" style="background:#000;"></canvas>
+</body>
+</html>
+<script>
+    window.onload=function () {
+        var oCanvas=document.getElementById("canvas"),
+            context=oCanvas.getContext("2d"),
+            w,h;
+        w=oCanvas.width=window.innerWidth;
+        h=oCanvas.height=window.innerHeight;
+
+        var clearColor="rgba(0,0,0,0.1)",
+            wordColor="#33ff33",
+            word="0123456789qwertyuiopasdfghjklzxcvbnm,./;'\\[]QWERTYUIOP{}ASDFGHJHJKL:ZXCVBBNM<>?",
+            wordArr=word.split(""),
+            font_size = 16,//字体大小
+            clumns = w / font_size,//掉落的列数
+            drops = [];
+        for(var i=0;i<clumns;i++){
+            drops[i]=1;//用来控制Y轴绘制的距离
+        }
+        function draw(){
+            context.save();
+            context.fillStyle = wordColor;
+            context.font = font_size + "px arial";
+            for(var i=0;i<drops.length;i++){
+                //随机获得字母
+                var text = wordArr[Math.floor(Math.random() * wordArr.length)];
+                //文字绘制（绘制的文字，文字的X坐标，文字的y坐标）
+                //x为0,16,32,48...       y为16,16,16,16...
+                //所以核心在于一行一行绘制
+                context.fillText(text, i * font_size, drops[i] * font_size);
+
+                //一种是超出长度一种是随机数大于0.98重新绘制
+                if (drops[i] * font_size > h && Math.random() > 0.98){
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+            context.restore();
+        }
+        //动画循环
+        (function drawFrame(){
+            window.requestAnimationFrame(drawFrame, oCanvas);
+            context.fillStyle = clearColor;
+            context.fillRect(0, 0, w, h);
+
+            draw();
+        }())
+
+        //resize
+        function resize(){
+            w = oCanvas.width = window.innerWidth;
+            h = oCanvas.height = window.innerHeight;
+        }
+        oCanvas.addEventListener("resize", resize);
+
+    }
+</script>
